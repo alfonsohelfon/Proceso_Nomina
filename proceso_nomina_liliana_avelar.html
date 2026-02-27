@@ -337,6 +337,12 @@
     font-size: 13px;
     font-weight: 600;
     color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .phase-connector .arrow:hover {
+    border-color: var(--primary);
+    color: var(--primary);
   }
   .phase-connector .arrow svg {
     width: 20px;
@@ -579,7 +585,7 @@
     </div>
 
     <div class="phase-connector">
-      <div class="arrow">
+      <div class="arrow" onclick="showPhase('noi', document.querySelectorAll('.phase-tab')[1])">
         <svg viewBox="0 0 24 24"><path d="M5 12h14m-7-7l7 7-7 7"/></svg>
         Continúa en NOI
       </div>
@@ -760,7 +766,7 @@
     </div>
 
     <div class="phase-connector">
-      <div class="arrow">
+      <div class="arrow" onclick="showPhase('verify', document.querySelectorAll('.phase-tab')[2])">
         <svg viewBox="0 0 24 24"><path d="M5 12h14m-7-7l7 7-7 7"/></svg>
         Continúa a Verificación
       </div>
@@ -819,6 +825,8 @@ function showPhase(phase, tab) {
   if (phase === 'noi') tab.classList.add('active-noi');
   else if (phase === 'verify') tab.classList.add('active-verify');
   else tab.classList.add('active');
+
+  document.querySelector('.phase-tabs').scrollIntoView({ behavior: 'smooth' });
 }
 </script>
 
