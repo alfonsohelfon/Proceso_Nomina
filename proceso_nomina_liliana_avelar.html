@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proceso Nómina — Liliana Avelar</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #f8f9fb;
+    --card: #ffffff;
+    --primary: #4f46e5;
+    --primary-light: #eef2ff;
+    --primary-dark: #3730a3;
+    --noi: #0891b2;
+    --noi-light: #ecfeff;
+    --noi-dark: #155e75;
+    --accent-green: #059669;
+    --accent-green-light: #ecfdf5;
+    --accent-orange: #d97706;
+    --accent-orange-light: #fffbeb;
+    --accent-red: #dc2626;
+    --accent-red-light: #fef2f2;
+    --text: #1e293b;
+    --text-secondary: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.05);
+    --radius: 12px;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 40px 20px;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+  }
+  .header .subtitle {
+    font-size: 15px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+  .header .badge {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 16px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  /* Phase tabs */
+  .phase-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 32px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .phase-tab {
+    padding: 10px 24px;
+    border-radius: 30px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 2px solid var(--border);
+    background: var(--card);
+    color: var(--text-secondary);
+    transition: all 0.2s;
+  }
+  .phase-tab:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+  }
+  .phase-tab.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+  }
+  .phase-tab.active-noi {
+    background: var(--noi);
+    color: white;
+    border-color: var(--noi);
+  }
+  .phase-tab.active-verify {
+    background: var(--accent-green);
+    color: white;
+    border-color: var(--accent-green);
+  }
+
+  /* Phase container */
+  .phase {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .phase.visible { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Section header */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .section-icon.prep { background: var(--primary-light); }
+  .section-icon.noi { background: var(--noi-light); }
+  .section-icon.verify { background: var(--accent-green-light); }
+  .section-title { font-size: 20px; font-weight: 700; }
+  .section-desc { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 40px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+    border-radius: 2px;
+  }
+  .timeline.noi-line::before {
+    background: linear-gradient(to bottom, var(--noi), var(--noi-dark));
+  }
+  .timeline.verify-line::before {
+    background: linear-gradient(to bottom, var(--accent-green), #047857);
+  }
+
+  /* Step card */
+  .step {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  .step:last-child { margin-bottom: 0; }
+
+  .step-dot {
+    position: absolute;
+    left: -40px;
+    top: 18px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    z-index: 2;
+    box-shadow: 0 0 0 4px var(--bg);
+  }
+  .step-dot.noi-dot { background: var(--noi); }
+  .step-dot.verify-dot { background: var(--accent-green); }
+
+  .step-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    box-shadow: var(--shadow);
+    transition: all 0.2s;
+    cursor: default;
+  }
+  .step-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+  }
+  .step-card h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .step-card p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  /* Tags */
+  .tag {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+  .tag-manual { background: var(--accent-orange-light); color: var(--accent-orange); }
+  .tag-system { background: var(--noi-light); color: var(--noi); }
+  .tag-review { background: var(--accent-green-light); color: var(--accent-green); }
+  .tag-download { background: var(--accent-red-light); color: var(--accent-red); }
+  .tag-input { background: var(--primary-light); color: var(--primary); }
+
+  /* Substeps */
+  .substeps {
+    margin-top: 12px;
+    padding: 14px 16px;
+    background: var(--bg);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  .substep {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 13px;
+    color: var(--text);
+  }
+  .substep + .substep {
+    border-top: 1px dashed #e2e8f0;
+  }
+  .substep-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    background: white;
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* People chips */
+  .people {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .person {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .person-icon {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+  }
+
+  /* Note */
+  .note {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #fffbeb;
+    border-left: 3px solid var(--accent-orange);
+    border-radius: 0 8px 8px 0;
+    font-size: 12px;
+    color: #92400e;
+  }
+
+  /* Connector arrow between phases */
+  .phase-connector {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 0;
+  }
+  .phase-connector .arrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 24px;
+    background: white;
+    border: 2px dashed var(--border);
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .phase-connector .arrow svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--primary);
+  }
+
+  /* Summary stats */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    text-align: center;
+    box-shadow: var(--shadow);
+  }
+  .stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--primary);
+  }
+  .stat-value.noi-val { color: var(--noi); }
+  .stat-value.green-val { color: var(--accent-green); }
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  /* Overview flow */
+  .overview-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 32px 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .flow-block {
+    flex: 1;
+    min-width: 180px;
+    padding: 18px 16px;
+    text-align: center;
+    border-radius: var(--radius);
+    position: relative;
+  }
+  .flow-block.prep-block {
+    background: var(--primary-light);
+    border: 2px solid #c7d2fe;
+  }
+  .flow-block.noi-block {
+    background: var(--noi-light);
+    border: 2px solid #a5f3fc;
+  }
+  .flow-block.verify-block {
+    background: var(--accent-green-light);
+    border: 2px solid #a7f3d0;
+  }
+  .flow-block h4 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .flow-block p {
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    font-size: 20px;
+    color: var(--text-secondary);
+  }
+
+  /* Print styles */
+  @media print {
+    body { padding: 20px; }
+    .phase-tabs { display: none; }
+    .phase { display: block !important; page-break-inside: avoid; margin-bottom: 40px; }
+    .step-card:hover { transform: none; box-shadow: var(--shadow); }
+  }
+
+  @media (max-width: 600px) {
+    .header h1 { font-size: 22px; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .overview-flow { flex-direction: column; align-items: center; }
+    .flow-arrow { transform: rotate(90deg); min-width: auto; min-height: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>Mapeo de Proceso — Nómina</h1>
+    <div class="subtitle">Proceso de Liliana Avelar</div>
+    <div class="badge">25 empresas en total</div>
+  </div>
+
+  <!-- Summary Stats -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-value">7</div>
+      <div class="stat-label">Pasos de Preparación</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value noi-val">8</div>
+      <div class="stat-label">Pasos en NOI</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value green-val">2</div>
+      <div class="stat-label">Pasos de Verificación</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" style="color: var(--accent-orange);">25</div>
+      <div class="stat-label">Empresas Procesadas</div>
+    </div>
+  </div>
+
+  <!-- Overview Flow -->
+  <div class="overview-flow">
+    <div class="flow-block prep-block">
+      <h4>📋 Preparación</h4>
+      <p>Recopilar incidencias, biométricos, INFONAVIT, FONACOT, altas/bajas</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-block noi-block">
+      <h4>💻 Captura en NOI</h4>
+      <p>Movimientos, faltas, verificación, reportes, timbrado CFDI</p>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-block verify-block">
+      <h4>✅ Verificación</h4>
+      <p>Formato BBVA en Excel → TXT, revisión manual de nombres y cuentas</p>
+    </div>
+  </div>
+
+  <!-- Phase Tabs -->
+  <div class="phase-tabs">
+    <div class="phase-tab active" onclick="showPhase('prep', this)">📋 Preparación</div>
+    <div class="phase-tab" onclick="showPhase('noi', this)">💻 NOI</div>
+    <div class="phase-tab" onclick="showPhase('verify', this)">✅ Verificación</div>
+  </div>
+
+  <!-- ==================== PHASE 1: PREPARACIÓN ==================== -->
+  <div class="phase visible" id="phase-prep">
+    <div class="section-header">
+      <div class="section-icon prep">📋</div>
+      <div>
+        <div class="section-title">Fase de Preparación</div>
+        <div class="section-desc">Recopilación y organización de datos antes de capturar en NOI</div>
+      </div>
+    </div>
+
+    <div class="timeline">
+
+      <!-- Step 1 -->
+      <div class="step">
+        <div class="step-dot">1</div>
+        <div class="step-card">
+          <h3>Solicitar incidencias <span class="tag tag-input">Entrada</span></h3>
+          <p>Solicitar las incidencias del periodo a todos los administradores de las 25 empresas.</p>
+          <div class="people">
+            <div class="person"><div class="person-icon">FJ</div> Francisco Juanes — Los Cabos</div>
+            <div class="person"><div class="person-icon">M</div> Maricruz — Acapulco</div>
+            <div class="person"><div class="person-icon">CG</div> Carlos García — Administrativos PH1 (biométrico)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step">
+        <div class="step-dot">2</div>
+        <div class="step-card">
+          <h3>Imprimir y agrupar por empresa <span class="tag tag-manual">Manual</span></h3>
+          <p>Una vez recibidas, se imprimen todas las incidencias y se organizan físicamente agrupándolas por empresa.</p>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step">
+        <div class="step-dot">3</div>
+        <div class="step-card">
+          <h3>Filtrar biométricos <span class="tag tag-system">Sistema</span></h3>
+          <p>Se filtran los registros del sistema biométrico para validar asistencia.</p>
+          <div class="note">⚠️ Los Cabos y Acapulco <strong>no cuentan con biométricos</strong>; sus incidencias se manejan manualmente.</div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step">
+        <div class="step-dot">4</div>
+        <div class="step-card">
+          <h3>Revisar créditos INFONAVIT <span class="tag tag-system">SUA</span></h3>
+          <p>Consultar en el <strong>Sistema Único de Autodeterminación (SUA)</strong> qué trabajadores tienen crédito INFONAVIT activo para aplicar las deducciones correspondientes.</p>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step">
+        <div class="step-dot">5</div>
+        <div class="step-card">
+          <h3>Descargar créditos FONACOT <span class="tag tag-download">Descarga</span></h3>
+          <p>Ingresar a la página de <strong>FONACOT</strong>, descargar el reporte mensual de trabajadores con crédito activo para posteriormente aplicar el descuento en NOI.</p>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step">
+        <div class="step-dot">6</div>
+        <div class="step-card">
+          <h3>Revisar altas, bajas y modificaciones <span class="tag tag-review">Revisión</span></h3>
+          <p>Identificar altas, bajas o modificaciones de salario del periodo actual.</p>
+          <div class="people">
+            <div class="person"><div class="person-icon">CV</div> Carolina Velázquez — notifica cambios</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 7 -->
+      <div class="step">
+        <div class="step-dot">7</div>
+        <div class="step-card">
+          <h3>Capturar datos en NOI <span class="tag tag-manual">Manual</span></h3>
+          <p>Se capturan todos los datos recopilados en los pasos anteriores dentro del sistema NOI, <strong>trabajador por trabajador</strong>, para cada una de las 25 empresas.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="phase-connector">
+      <div class="arrow">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14m-7-7l7 7-7 7"/></svg>
+        Continúa en NOI
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PHASE 2: NOI ==================== -->
+  <div class="phase" id="phase-noi">
+    <div class="section-header">
+      <div class="section-icon noi">💻</div>
+      <div>
+        <div class="section-title">Captura en Sistema NOI</div>
+        <div class="section-desc">Operaciones dentro del software de nómina NOI — proceso repetido por cada empresa</div>
+      </div>
+    </div>
+
+    <div class="timeline noi-line">
+
+      <!-- NOI Step 1 -->
+      <div class="step">
+        <div class="step-dot noi-dot">1</div>
+        <div class="step-card">
+          <h3>Movimientos a la nómina <span class="tag tag-manual">Manual</span></h3>
+          <p>Click en <strong>"Movimientos a la nómina"</strong> y capturar manualmente por cada trabajador:</p>
+          <div class="substeps">
+            <div class="substep">
+              <div class="substep-num">a</div>
+              <div>Ingresar <strong>clave del trabajador</strong></div>
+            </div>
+            <div class="substep">
+              <div class="substep-num">b</div>
+              <div>Ingresar <strong>Clave Per./Ded.</strong> — ej: <code>P019</code> (Prima Dominical)</div>
+            </div>
+            <div class="substep">
+              <div class="substep-num">c</div>
+              <div>Ingresar <strong>monto o fórmula</strong> — ej: <code>sd*.25</code> (25% del salario diario)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOI Step 2 -->
+      <div class="step">
+        <div class="step-dot noi-dot">2</div>
+        <div class="step-card">
+          <h3>Registro de faltas <span class="tag tag-manual">Manual</span></h3>
+          <p>Click en <strong>"Faltas"</strong> y capturar manualmente por cada trabajador:</p>
+          <div class="substeps">
+            <div class="substep">
+              <div class="substep-num">a</div>
+              <div>Ingresar <strong>clave del trabajador</strong></div>
+            </div>
+            <div class="substep">
+              <div class="substep-num">b</div>
+              <div>Seleccionar <strong>día de falta</strong> (calendario desplegable)</div>
+            </div>
+            <div class="substep">
+              <div class="substep-num">c</div>
+              <div>Seleccionar <strong>tipo de falta</strong>: Incapacidad, Ausentismo, Incapacidad temporal, Incapacidad permanente parcial, Incapacidad permanente total</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOI Step 3 -->
+      <div class="step">
+        <div class="step-dot noi-dot">3</div>
+        <div class="step-card">
+          <h3>Verificar nómina del trabajador <span class="tag tag-review">Revisión</span></h3>
+          <p>Click en <strong>"Nómina del trabajador"</strong> para verificar cada recibo:</p>
+          <div class="substeps">
+            <div class="substep">
+              <div class="substep-num">a</div>
+              <div>Ingresar <strong>clave del trabajador</strong></div>
+            </div>
+            <div class="substep">
+              <div class="substep-num">b</div>
+              <div>Se despliega el <strong>recibo</strong> con percepciones y faltas del periodo. Se verifica que coincidan las faltas y primas capturadas anteriormente.</div>
+            </div>
+          </div>
+          <div class="note">💡 El salario base se calcula automáticamente al estar dado de alta el trabajador en el sistema.</div>
+        </div>
+      </div>
+
+      <!-- NOI Step 4 -->
+      <div class="step">
+        <div class="step-dot noi-dot">4</div>
+        <div class="step-card">
+          <h3>Generar reporte de nómina clásico <span class="tag tag-download">Descarga PDF</span></h3>
+          <p>Click en <strong>"Reporte de la nómina » Reporte de nómina clásico"</strong>:</p>
+          <div class="substeps">
+            <div class="substep">
+              <div class="substep-num">a</div>
+              <div>Cambiar título — ej: <code>"1RA QNA MARZO 2026"</code></div>
+            </div>
+            <div class="substep">
+              <div class="substep-num">b</div>
+              <div>Se descarga el reporte en <strong>PDF</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOI Step 5 -->
+      <div class="step">
+        <div class="step-dot noi-dot">5</div>
+        <div class="step-card">
+          <h3>Generar depósitos de pago <span class="tag tag-download">Descarga PDF</span></h3>
+          <p>Click en <strong>"Pago de nómina » Depósitos de pago de nómina"</strong>:</p>
+          <div class="substeps">
+            <div class="substep">
+              <div class="substep-num">a</div>
+              <div>Cambiar título — ej: <code>"1RA QNA MARZO 2026"</code></div>
+            </div>
+            <div class="substep">
+              <div class="substep-num">b</div>
+              <div>Se descarga PDF con datos: Clave trabajador, Nombre, J. Completa (Sí/No), Clave empresa, Banco (ej. BBVA Bancomer), No. de cuenta, Total a pagar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOI Step 6 -->
+      <div class="step">
+        <div class="step-dot noi-dot">6</div>
+        <div class="step-card">
+          <h3>Cierre total de nómina <span class="tag tag-system">Sistema</span></h3>
+          <p>Click en <strong>"Cierre total de nómina"</strong> e ingresar la <strong>clave de usuario</strong> para confirmar el cierre del periodo.</p>
+        </div>
+      </div>
+
+      <!-- NOI Step 7 -->
+      <div class="step">
+        <div class="step-dot noi-dot">7</div>
+        <div class="step-card">
+          <h3>Timbrado CFDI y descarga <span class="tag tag-download">Descarga XML + PDF</span></h3>
+          <p>Click en <strong>"CFDI" » "Recibos electrónicos"</strong> y para cada trabajador:</p>
+          <div class="substeps">
+            <div class="substep">
+              <div class="substep-num">a</div>
+              <div><strong>Ctrl+T</strong> → "Timbrar CFDI"</div>
+            </div>
+            <div class="substep">
+              <div class="substep-num">b</div>
+              <div>Ingresar <strong>fecha de pago</strong></div>
+            </div>
+            <div class="substep">
+              <div class="substep-num">c</div>
+              <div>Seleccionar <strong>todas las filas</strong></div>
+            </div>
+            <div class="substep">
+              <div class="substep-num">d</div>
+              <div>Click en <strong>"Ruta de extracción de los CFDI's de Nómina"</strong> → Descargar en formato <strong>XML</strong> y <strong>PDF</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOI Step 8 -->
+      <div class="step">
+        <div class="step-dot noi-dot">8</div>
+        <div class="step-card">
+          <h3>Reporte por percepción/deducción <span class="tag tag-download">Descarga PDF</span></h3>
+          <p>Click en <strong>"Reportes" » "Por Percepción/deducción"</strong>:</p>
+          <div class="substeps">
+            <div class="substep">
+              <div class="substep-num">a</div>
+              <div>Seleccionar <strong>"Detalle de percepciones y/o deducciones"</strong></div>
+            </div>
+            <div class="substep">
+              <div class="substep-num">b</div>
+              <div>Se descarga el reporte en <strong>PDF</strong> con las percepciones y deducciones del periodo</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="phase-connector">
+      <div class="arrow">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14m-7-7l7 7-7 7"/></svg>
+        Continúa a Verificación
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PHASE 3: VERIFICACIÓN ==================== -->
+  <div class="phase" id="phase-verify">
+    <div class="section-header">
+      <div class="section-icon verify">✅</div>
+      <div>
+        <div class="section-title">Verificación Final</div>
+        <div class="section-desc">Control de calidad manual sobre los archivos generados</div>
+      </div>
+    </div>
+
+    <div class="timeline verify-line">
+
+      <!-- Verify Step 1 -->
+      <div class="step">
+        <div class="step-dot verify-dot">1</div>
+        <div class="step-card">
+          <h3>Convertir a formato BBVA (Excel → TXT) <span class="tag tag-manual">Manual</span></h3>
+          <p>Los archivos que se descargan de NOI se agregan al <strong>formato de BBVA en Excel</strong> y se convierten a <strong>formato TXT</strong> para su procesamiento bancario.</p>
+        </div>
+      </div>
+
+      <!-- Verify Step 2 -->
+      <div class="step">
+        <div class="step-dot verify-dot">2</div>
+        <div class="step-card">
+          <h3>Revisión manual de datos <span class="tag tag-review">Revisión</span></h3>
+          <p>Liliana y Carolina revisan manualmente (a ojo) <strong>nombre por nombre y cuenta por cuenta</strong> que todos los datos estén correctos antes de proceder con los depósitos.</p>
+          <div class="people">
+            <div class="person"><div class="person-icon">LA</div> Liliana Avelar</div>
+            <div class="person"><div class="person-icon">CV</div> Carolina Velázquez</div>
+          </div>
+          <div class="note">⚠️ Este paso es crítico: cualquier error en nombre o cuenta bancaria puede resultar en depósitos incorrectos.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showPhase(phase, tab) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('visible'));
+  document.querySelectorAll('.phase-tab').forEach(t => {
+    t.classList.remove('active', 'active-noi', 'active-verify');
+  });
+
+  document.getElementById('phase-' + phase).classList.add('visible');
+
+  if (phase === 'noi') tab.classList.add('active-noi');
+  else if (phase === 'verify') tab.classList.add('active-verify');
+  else tab.classList.add('active');
+}
+</script>
+
+</body>
+</html>
